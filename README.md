@@ -6,7 +6,7 @@ be tested before the next one begins.
 
 ## Current implementation status
 
-**Completed: Stage 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Database & Project Management.**
+**Completed: Stage 2 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Database & Project Management.**
 
 The repository currently includes:
 
@@ -26,9 +26,9 @@ The repository currently includes:
 The following features from the overall architecture are **not implemented
 yet** because they belong to later stages:
 
-- CSV analysis and preprocessing (Stages 4ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“5)
-- AutoML, workers, predictions, and model versioning (Stages 6ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“8)
-- Image annotation and YOLO (Stages 9ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“10)
+- CSV analysis and preprocessing (Stages 4ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ5)
+- AutoML, workers, predictions, and model versioning (Stages 6ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ8)
+- Image annotation and YOLO (Stages 9ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ10)
 - Active learning (Stage 11)
 - Final production hardening (Stage 12)
 
@@ -106,6 +106,27 @@ Stage 5 adds a user-approved tabular preprocessing configuration:
 From a completed CSV analysis, select **Review preprocessing**, choose the
 target, decide every recommendation, and approve the configuration. This stage
 constructs preprocessing only; model selection and training begin in Stage 6.
+## Stage 6 features
+
+Stage 6 adds plugin-based tabular AutoML:
+
+- A stable model-plugin interface and registry
+- Logistic Regression / Linear Regression baseline plugin
+- Random Forest classifier and regressor plugin
+- Histogram Gradient Boosting classifier and regressor plugin
+- Selection of one or multiple candidate models
+- Deterministic train/test splitting with classification stratification when safe
+- Classification metrics: accuracy, weighted precision, recall, F1, confusion
+  matrix, and binary ROC-AUC when available
+- Regression metrics: MAE, MSE, RMSE, and R-squared
+- Complete preprocessing-and-model pipelines exported as `.joblib`
+- TrainingJob records containing configuration, progress, results, and paths
+- Bootstrap candidate configuration and metric-comparison pages
+
+Open an approved preprocessing configuration and select **Train models**.
+Stage 6 executes training synchronously for a simple verified baseline. Stage 7
+will move this same service boundary into a local background process and expose
+progress polling.
 ## Architecture
 
 ModelForge Local uses a layered Flask architecture:
@@ -210,9 +231,9 @@ Activate the virtual environment and run:
 python -m pytest -v
 ```
 
-Expected result: all tests pass. The current Stage 5 suite contains 25 tests.
+Expected result: all tests pass. The current Stage 6 suite contains 29 tests.
 
-The tests verify the foundation, Project CRUD, secure dataset ingestion, CSV findings, preprocessing decision validation, persisted approvals, and fitted numeric/categorical transformations.
+The tests verify the foundation, project and dataset workflows, CSV analysis, preprocessing, plugin registration, classification and regression training, metrics, and loadable joblib artifacts.
 
 You can also verify imports directly:
 

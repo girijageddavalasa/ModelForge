@@ -19,5 +19,6 @@ setup(
         "numpy==2.3.2",
         "pandas==2.3.1",
         "scikit-learn==1.7.1",
+        "joblib==1.5.1",
     ],
 )

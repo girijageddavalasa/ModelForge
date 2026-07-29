@@ -13,6 +13,7 @@ from app.routes.datasets import datasets
 from app.routes.errors import errors
 from app.routes.main import main
 from app.routes.projects import projects
+from app.routes.training import training
 
 
 def create_app(config_name: str | None = None) -> Flask:
@@ -91,6 +92,7 @@ def register_routes(app: Flask) -> None:
     app.register_blueprint(main)
     app.register_blueprint(datasets)
     app.register_blueprint(projects)
+    app.register_blueprint(training)
 
 
 def register_error_handlers(app: Flask) -> None:
