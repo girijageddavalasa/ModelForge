@@ -1,8 +1,8 @@
-﻿"""Dataset upload, browsing, and analysis routes."""
+"""Dataset upload, browsing, and analysis routes."""
 
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 
-from app.services import csv_analysis_service, dataset_service, project_service
+from app.services import csv_analysis_service, dataset_service, preprocessing_service, project_service
 from app.services.dataset_service import DatasetNotFoundError, DatasetValidationError
 from app.services.project_service import ProjectNotFoundError
 
@@ -69,3 +69,37 @@ def analysis(dataset_id: int) -> str:
         version = max(dataset.versions, key=lambda item: item.version_number)
         columns = version.metadata_json.get("analysis", {}).get("data_types", {}).keys()
     return render_template("datasets/analysis.html", dataset=dataset, analysis=result, columns=columns)
+@datasets.route("/datasets/<int:dataset_id>/preprocessing", methods=["GET", "POST"])
+def preprocessing(dataset_id: int) -> str:
+    """Display and persist preprocessing recommendation decisions."""
+    try:
+        dataset = dataset_service.get_dataset(dataset_id)
+        if dataset.dataset_type != "tabular":
+            raise DatasetValidationError("Preprocessing is available only for tabular datasets.")
+        version = max(dataset.versions, key=lambda item: item.version_number)
+        analysis_result = version.metadata_json.get("analysis")
+        if not analysis_result:
+            flash("Run CSV analysis before approving preprocessing.", "warning")
+            return redirect(url_for("datasets.analysis", dataset_id=dataset.id))
+        saved = preprocessing_service.get_preprocessing(dataset)
+        if request.method == "POST":
+            decisions = {
+                index: request.form.get(f"decision_{index}", "")
+                for index in range(len(analysis_result.get("recommendations", [])))
+            }
+            saved = preprocessing_service.save_decisions(
+                dataset,
+                request.form.get("target_column", "").strip(),
+                decisions,
+            )
+            flash("Preprocessing decisions approved.", "success")
+    except DatasetNotFoundError:
+        abort(404)
+    except DatasetValidationError as error:
+        flash(str(error), "danger")
+    return render_template(
+        "datasets/preprocessing.html",
+        dataset=dataset,
+        analysis=analysis_result,
+        preprocessing=saved,
+    )

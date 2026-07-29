@@ -6,7 +6,7 @@ be tested before the next one begins.
 
 ## Current implementation status
 
-**Completed: Stage 2 Ã¢â‚¬â€ Database & Project Management.**
+**Completed: Stage 2 ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Â Database & Project Management.**
 
 The repository currently includes:
 
@@ -26,9 +26,9 @@ The repository currently includes:
 The following features from the overall architecture are **not implemented
 yet** because they belong to later stages:
 
-- CSV analysis and preprocessing (Stages 4Ã¢â‚¬â€œ5)
-- AutoML, workers, predictions, and model versioning (Stages 6Ã¢â‚¬â€œ8)
-- Image annotation and YOLO (Stages 9Ã¢â‚¬â€œ10)
+- CSV analysis and preprocessing (Stages 4ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“5)
+- AutoML, workers, predictions, and model versioning (Stages 6ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“8)
+- Image annotation and YOLO (Stages 9ÃƒÂ¢Ã¢â€šÂ¬Ã¢â‚¬Å“10)
 - Active learning (Stage 11)
 - Final production hardening (Stage 12)
 
@@ -90,6 +90,22 @@ Stage 4 adds on-demand CSV quality analysis for tabular datasets:
 Open a tabular dataset and select **Analyze CSV**. Optionally enter a target
 column, then run the analysis. Recommendations are advisory: Stage 4 never
 removes columns or changes data. Approval and preprocessing begin in Stage 5.
+## Stage 5 features
+
+Stage 5 adds a user-approved tabular preprocessing configuration:
+
+- Approve or reject every Stage 4 recommendation
+- Required target-column selection
+- Approved exclusion of constant and identifier-like feature columns
+- Persisted decisions and pipeline configuration in DatasetVersion metadata
+- Median numeric imputation and standard scaling
+- Most-frequent categorical imputation and unknown-safe one-hot encoding
+- A reusable scikit-learn `Pipeline` containing a `ColumnTransformer`
+- A Bootstrap approval page with the measured issue and rationale
+
+From a completed CSV analysis, select **Review preprocessing**, choose the
+target, decide every recommendation, and approve the configuration. This stage
+constructs preprocessing only; model selection and training begin in Stage 6.
 ## Architecture
 
 ModelForge Local uses a layered Flask architecture:
@@ -194,9 +210,9 @@ Activate the virtual environment and run:
 python -m pytest -v
 ```
 
-Expected result: all tests pass. The current Stage 4 suite contains 21 tests.
+Expected result: all tests pass. The current Stage 5 suite contains 25 tests.
 
-The tests verify the application foundation, Project CRUD, secure dataset ingestion, and CSV findings including missing values, duplicates, correlations, class imbalance, constant columns, outliers, and invalid targets.
+The tests verify the foundation, Project CRUD, secure dataset ingestion, CSV findings, preprocessing decision validation, persisted approvals, and fitted numeric/categorical transformations.
 
 You can also verify imports directly:
 
