@@ -9,7 +9,7 @@ ModelForge Local is a local-first AutoML and active-learning platform for tabula
 - Flask application factory with development, testing, and production configuration
 - SQLAlchemy ORM, SQLite, Flask-Migrate, Bootstrap 5, structured logging, and environment loading
 - Project CRUD and dashboard
-- Secure CSV, image, and ZIP dataset upload with immutable dataset versions
+- Secure CSV, image, and ZIP dataset upload with immutable dataset versions; standard macOS ZIP metadata is ignored
 - CSV quality analysis and recommendations
 - Approved scikit-learn preprocessing pipelines
 - Tabular AutoML for classification and regression
@@ -76,7 +76,7 @@ node --check app/static/js/annotation_canvas.js
 python -m flask --app run.py db check
 ```
 
-The current automated suite contains 57 passing tests. YOLO training may download the selected base weights on first use.
+The current automated suite contains 58 passing tests. YOLO training may download the selected base weights on first use.
 
 ## Active-learning workflow
 

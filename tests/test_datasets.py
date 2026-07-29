@@ -1,4 +1,4 @@
-﻿"""Dataset upload integration tests."""
+"""Dataset upload integration tests."""
 
 from __future__ import annotations
 
@@ -108,6 +108,28 @@ def test_upload_image_zip(client: FlaskClient) -> None:
     assert response.status_code == 200
     assert b"sign.png" in response.data
 
+
+def test_upload_zip_ignores_macos_metadata(client: FlaskClient) -> None:
+    """macOS ZIP metadata is ignored while real images are ingested."""
+    archive = io.BytesIO()
+    with zipfile.ZipFile(archive, "w") as bundle:
+        bundle.writestr("train/.DS_Store", b"metadata")
+        bundle.writestr("__MACOSX/train/._sign.png", b"apple-double")
+        bundle.writestr("train/sign.png", image_bytes())
+        bundle.writestr("train/road.png", image_bytes())
+    archive.seek(0)
+    project = create_project("object_detection")
+    response = client.post(
+        f"/projects/{project.id}/datasets/upload",
+        data={"name": "Mac archive", "files": (archive, "images.zip")},
+        content_type="multipart/form-data",
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+    dataset = db.session.scalar(db.select(Dataset))
+    assert dataset is not None
+    assert dataset.versions[0].record_count == 2
+    assert dataset.versions[0].metadata_json["files"] == ["sign.png", "road.png"]
 
 def test_reject_zip_path_traversal(client: FlaskClient) -> None:
     """ZIP members cannot escape the dataset directory."""

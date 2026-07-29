@@ -1,4 +1,4 @@
-﻿"""Secure local dataset ingestion services."""
+"""Secure local dataset ingestion services."""
 
 from __future__ import annotations
 
@@ -194,16 +194,24 @@ def _prepare_zip(upload: FileStorage) -> list[PreparedFile]:
             members = [member for member in archive.infolist() if not member.is_dir()]
             if not members:
                 raise DatasetValidationError("The ZIP archive contains no files.")
-            if len(members) > max_files:
-                raise DatasetValidationError(f"The ZIP archive exceeds the {max_files}-file limit.")
-            if sum(member.file_size for member in members) > max_size:
-                raise DatasetValidationError("The ZIP archive is too large when extracted.")
-            prepared: list[PreparedFile] = []
-            seen: set[str] = set()
             for member in members:
                 path = PurePosixPath(member.filename)
                 if path.is_absolute() or ".." in path.parts:
                     raise DatasetValidationError(f"Unsafe path in ZIP archive: {member.filename}.")
+            image_members = [
+                member for member in members
+                if not _is_ignored_archive_metadata(PurePosixPath(member.filename))
+            ]
+            if not image_members:
+                raise DatasetValidationError("The ZIP archive contains no images.")
+            if len(image_members) > max_files:
+                raise DatasetValidationError(f"The ZIP archive exceeds the {max_files}-file limit.")
+            if sum(member.file_size for member in image_members) > max_size:
+                raise DatasetValidationError("The ZIP archive is too large when extracted.")
+            prepared: list[PreparedFile] = []
+            seen: set[str] = set()
+            for member in image_members:
+                path = PurePosixPath(member.filename)
                 name = _safe_name(path.name)
                 if Path(name).suffix.lower() not in IMAGE_EXTENSIONS:
                     raise DatasetValidationError(f"Unsupported file in ZIP archive: {member.filename}.")
@@ -217,6 +225,10 @@ def _prepare_zip(upload: FileStorage) -> list[PreparedFile]:
     except zipfile.BadZipFile as error:
         raise DatasetValidationError("The uploaded ZIP archive is corrupted.") from error
 
+
+def _is_ignored_archive_metadata(path: PurePosixPath) -> bool:
+    """Return whether a safe ZIP member is standard macOS metadata."""
+    return "__MACOSX" in path.parts or path.name == ".DS_Store" or path.name.startswith("._")
 
 def _validate_image(content: bytes, name: str) -> None:
     """Verify that bytes represent a readable image."""
