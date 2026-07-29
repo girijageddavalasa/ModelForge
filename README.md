@@ -1,83 +1,261 @@
-# ModelForge Local
+﻿# ModelForge Local
 
-ModelForge Local is a local-first AutoML and active learning platform. Stage 1
-provides the production-oriented Flask foundation; ML features, APIs,
-authentication, and database models are intentionally not included yet.
+ModelForge Local is planned as a local-first AutoML and active-learning
+platform. Development is deliberately divided into stages so every stage can
+be tested before the next one begins.
 
-## Requirements
+## Current implementation status
+
+**Completed: Stage 1 — Project Foundation.**
+
+The repository currently includes:
+
+- Flask application factory (`app.create_app`)
+- Development, testing, and production configuration classes
+- `.env` environment-variable loading
+- Flask-SQLAlchemy and Flask-Migrate initialization
+- SQLite connection configuration
+- Bootstrap 5 integration
+- Console logging
+- Thin route blueprints for the homepage and error handlers
+- Custom 404 and 500 pages
+- Automatic creation of `instance/` and `storage/`
+- Pytest foundation tests
+- Optional Docker configuration
+
+The following features from the overall architecture are **not implemented
+yet** because they belong to later stages:
+
+- SQLAlchemy models, schema migrations, and Project CRUD (Stage 2)
+- CSV, image, and ZIP uploads (Stage 3)
+- CSV analysis and preprocessing (Stages 4–5)
+- AutoML, workers, predictions, and model versioning (Stages 6–8)
+- Image annotation and YOLO (Stages 9–10)
+- Active learning (Stage 11)
+- Final production hardening (Stage 12)
+
+Do not expect project creation, dataset upload, model training, annotations, or
+prediction APIs in the Stage 1 application.
+
+## Architecture
+
+ModelForge Local uses a layered Flask architecture:
+
+```text
+Browser
+   |
+   v
+Routes / Jinja templates   <- HTTP handling and Bootstrap pages
+   |
+   v
+Services                   <- business logic added in later stages
+   |
+   +-----------> SQLAlchemy / SQLite metadata
+   |
+   +-----------> Local storage for large files and model artifacts
+```
+
+Routes should remain thin. Future business rules belong in `app/services/`,
+while future database entities belong in `app/models/`.
+
+## What SQLite is used for
+
+SQLite is the local relational database for ModelForge Local. It stores
+structured application metadata such as projects, dataset records, annotation
+records, training jobs, and model-version records as those features are added
+in later stages.
+
+SQLite does **not** store large CSV files, images, or trained model files. Those
+belong in the local `storage/` directory; SQLite stores paths and metadata that
+refer to them.
+
+SQLite is a good default for this project because:
+
+- Python includes SQLite support.
+- No separate database server must be installed or started.
+- The database is a single local file: `instance/modelforge.db`.
+- It suits a local, single-user application.
+- SQLAlchemy provides an abstraction that can support PostgreSQL later.
+
+Stage 1 configures SQLite, but it does not create application tables because
+database models and the first migration belong to Stage 2. The database file
+may therefore not exist until migrations are created and applied in Stage 2.
+
+## Prerequisites
+
+Install:
 
 - Python 3.11 or newer
-- `pip`
+- Git
+- `pip` (normally installed with Python)
+- A modern browser
 
-## Installation
+Docker is optional. PostgreSQL, Redis, Node.js, React, and a GPU are not
+required for Stage 1.
+
+Check Python and Git:
+
+```text
+python --version
+git --version
+```
+
+## Install and run on Windows PowerShell
 
 ```powershell
+git clone https://github.com/girijageddavalasa/modelforge-local.git
 cd modelforge-local
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 Copy-Item .env.example .env
 python run.py
 ```
 
-Open <http://127.0.0.1:5000> in a browser.
+Open <http://127.0.0.1:5000> or <http://localhost:5000>. You should see a
+Bootstrap page containing the title **ModelForge Local**. Stop the server with
+`Ctrl+C`.
 
-On macOS or Linux, activate the environment with
-`source .venv/bin/activate` and copy the environment file with
-`cp .env.example .env`.
+If PowerShell blocks activation, either adjust its execution policy for your
+user or run commands directly with `.venv\Scripts\python.exe`.
+
+## Install and run on Linux or macOS
+
+```bash
+git clone https://github.com/girijageddavalasa/modelforge-local.git
+cd modelforge-local
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+cp .env.example .env
+python run.py
+```
+
+Open <http://127.0.0.1:5000> and stop the server with `Ctrl+C`.
+
+## How to test Stage 1 yourself
+
+Activate the virtual environment and run:
+
+```text
+python -m pytest -v
+```
+
+Expected result:
+
+```text
+3 passed
+```
+
+The tests verify that:
+
+1. The application factory creates a testing application.
+2. The homepage responds successfully and contains the project title.
+3. An unknown URL returns the custom 404 page.
+
+You can also verify imports directly:
+
+```text
+python -c "from app import create_app; app = create_app('testing'); print(app.name)"
+```
+
+Expected output includes `app` and an initialization log message.
+
+For a manual browser test:
+
+1. Run `python run.py`.
+2. Visit <http://127.0.0.1:5000>.
+3. Confirm that **ModelForge Local** is displayed.
+4. Visit <http://127.0.0.1:5000/does-not-exist>.
+5. Confirm that the custom 404 page is displayed.
+6. Press `Ctrl+C` in the terminal.
 
 ## Configuration
 
-Configuration is loaded from environment variables and an optional `.env`
-file. Available environments are `development`, `production`, and `testing`,
-selected with `FLASK_ENV`.
+Copy `.env.example` to `.env`. Supported values include:
 
-For production, set a strong `SECRET_KEY`. SQLite data defaults to
-`instance/modelforge.db`, and application artifacts default to `storage/`.
-Both directories are created automatically at startup.
+```dotenv
+FLASK_ENV=development
+SECRET_KEY=replace-with-a-long-random-value
+DATABASE_URL=sqlite:///instance/modelforge.db
+STORAGE_PATH=storage
+LOG_LEVEL=INFO
+```
+
+Never commit the real `.env` file. A strong `SECRET_KEY` is mandatory when
+`FLASK_ENV=production`.
 
 ## Project structure
 
 ```text
-app/
-  models/       Future SQLAlchemy model modules
-  routes/       Future Flask blueprints and thin HTTP handlers
-  services/     Business logic
-  workers/      Background worker modules
-  ml/           Future machine-learning implementation
-  templates/    Jinja HTML templates
-  static/       CSS and browser assets
-  utils/        Shared helpers
-instance/       Local SQLite database and instance state
-migrations/     Flask-Migrate migration history
-storage/        Local datasets, artifacts, and model files
-tests/          Automated tests
+modelforge-local/
+|-- app/
+|   |-- __init__.py       Application factory and initialization
+|   |-- config.py         Environment-specific configuration
+|   |-- extensions.py     Unbound Flask extensions
+|   |-- models/           Models begin in Stage 2
+|   |-- routes/           Thin HTTP blueprints
+|   |-- services/         Future business logic
+|   |-- workers/          Future background jobs
+|   |-- ml/               Future ML plugins
+|   |-- templates/        Jinja and Bootstrap pages
+|   |-- static/           CSS and future Vanilla JavaScript
+|   `-- utils/            Future shared utilities
+|-- instance/             Future SQLite database and local instance data
+|-- migrations/           Future Flask-Migrate revision history
+|-- storage/              Future datasets and model artifacts
+|-- tests/                Automated tests
+|-- requirements.txt      Pinned Python dependencies
+|-- run.py                Local application entry point
+|-- setup.py              Python package metadata
+|-- .env.example          Safe configuration example
+|-- Dockerfile            Optional container image
+`-- docker-compose.yml    Optional local container service
 ```
 
-The application factory is `app.create_app`. Extension objects are created
-unbound in `app/extensions.py` and initialized by the factory, which keeps the
-application testable and avoids import cycles.
+The current `setup.py` is package metadata; application startup remains
+`python run.py`.
 
-## Testing
+## Optional Docker run
 
-```powershell
-python -m pytest
-```
+Set `SECRET_KEY` in your shell, then run:
 
-## Docker
-
-Set `SECRET_KEY` in your environment, then run:
-
-```powershell
+```text
 docker compose up --build
 ```
 
-## Stage 1 scope
+Docker is not required for normal local development.
 
-Stage 1 includes only the application foundation, configuration, extension
-initialization, logging, Bootstrap shell, SQLite connection settings, and
-runtime storage directories. Web handlers are organized as blueprints in
-`app/routes/`; routes render responses while future business logic belongs in
-`app/services/`. Database models, schema migrations, authentication, APIs, and
-machine-learning features are intentionally deferred to later stages.
+## Publish to your GitHub account
+
+First create an empty repository named `modelforge-local` under the GitHub
+account `girijageddavalasa`. Do not initialize it with another README, license,
+or `.gitignore`. Then, from this project directory, run:
+
+```text
+git branch -M main
+git remote add origin https://github.com/girijageddavalasa/modelforge-local.git
+git push -u origin main
+```
+
+If `origin` already exists, inspect it with `git remote -v` and change it with:
+
+```text
+git remote set-url origin https://github.com/girijageddavalasa/modelforge-local.git
+```
+
+GitHub may ask you to authenticate through a browser or personal access token.
+
+## Troubleshooting
+
+- `ModuleNotFoundError`: activate `.venv` and rerun
+  `python -m pip install -r requirements.txt`.
+- `python` is not recognized: reinstall Python 3.11+ and enable the installer
+  option that adds Python to `PATH`; on Linux/macOS, try `python3`.
+- Port 5000 is busy: stop the other process using that port before starting the
+  application.
+- Production refuses to start: set a non-default `SECRET_KEY`.
+- No SQLite file exists yet: this is expected in Stage 1 because models and
+  migrations begin in Stage 2.
