@@ -6,7 +6,7 @@ be tested before the next one begins.
 
 ## Current implementation status
 
-**Completed: Stage 2 — Database & Project Management.**
+**Completed: Stage 2 â€” Database & Project Management.**
 
 The repository currently includes:
 
@@ -26,10 +26,9 @@ The repository currently includes:
 The following features from the overall architecture are **not implemented
 yet** because they belong to later stages:
 
-- CSV, image, and ZIP uploads (Stage 3)
-- CSV analysis and preprocessing (Stages 4–5)
-- AutoML, workers, predictions, and model versioning (Stages 6–8)
-- Image annotation and YOLO (Stages 9–10)
+- CSV analysis and preprocessing (Stages 4â€“5)
+- AutoML, workers, predictions, and model versioning (Stages 6â€“8)
+- Image annotation and YOLO (Stages 9â€“10)
 - Active learning (Stage 11)
 - Final production hardening (Stage 12)
 
@@ -56,6 +55,24 @@ python -m flask --app run.py db upgrade
 
 Then start the server with `python run.py`. From the dashboard, select **New
 project**, enter a name, select one of the three supported task types, and save.
+## Stage 3 features
+
+Stage 3 adds secure local dataset ingestion:
+
+- One UTF-8 CSV file for tabular classification or regression projects
+- Multiple JPG, JPEG, PNG, WEBP, or BMP files for object-detection projects
+- One ZIP archive containing images for object-detection projects
+- Extension, empty-file, CSV-header, data-row, image-content, duplicate-name,
+  request-size, archive-size, archive-count, and unsafe-path validation
+- Project-specific immutable directories under `storage/datasets/`
+- Dataset and initial DatasetVersion records after successful storage
+- Dataset list, upload, and detail pages
+- Cleanup of partially written files and database rollback on failure
+
+To test manually, create a project, open its **Datasets** page, select **Upload
+dataset**, and choose files appropriate to the project's task type. Successful
+uploads show an inventory and relative storage path. Stage 3 validates only
+safe ingestion; statistical CSV analysis begins in Stage 4.
 ## Architecture
 
 ModelForge Local uses a layered Flask architecture:
@@ -160,9 +177,9 @@ Activate the virtual environment and run:
 python -m pytest -v
 ```
 
-Expected result: all tests pass. The current Stage 2 suite contains 9 tests.
+Expected result: all tests pass. The current Stage 3 suite contains 17 tests.
 
-The tests verify application creation, the dashboard, custom errors, project creation, input validation, project editing, deletion, and missing-project handling.
+The tests verify the application foundation, Project CRUD, CSV and image uploads, ZIP ingestion, corrupted-file rejection, duplicate-name rejection, upload limits, and path-traversal protection.
 
 You can also verify imports directly:
 

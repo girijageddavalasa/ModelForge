@@ -11,6 +11,12 @@ def not_found(_error: Exception) -> tuple[str, int]:
     return render_template("errors/404.html"), 404
 
 
+@errors.app_errorhandler(413)
+def payload_too_large(_error: Exception) -> tuple[str, int]:
+    """Render a clear response when an upload exceeds the configured limit."""
+    return render_template("errors/413.html"), 413
+
+
 @errors.app_errorhandler(500)
 def internal_server_error(error: Exception) -> tuple[str, int]:
     """Log an unhandled error and render a safe response."""

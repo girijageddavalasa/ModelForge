@@ -1,0 +1,6 @@
+﻿{% extends "base.html" %}
+{% block title %}Datasets · {{ project.name }}{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4"><div><a class="text-decoration-none" href="{{ url_for('projects.detail', project_id=project.id) }}">{{ project.name }}</a><h1 class="h2 mt-2">Datasets</h1></div><a class="btn btn-primary" href="{{ url_for('datasets.upload', project_id=project.id) }}">Upload dataset</a></div>
+<div class="list-group shadow-sm">{% for dataset in datasets %}<a class="list-group-item list-group-item-action py-3" href="{{ url_for('datasets.detail', dataset_id=dataset.id) }}"><div class="d-flex justify-content-between"><strong>{{ dataset.name }}</strong><span class="badge text-bg-success">{{ dataset.status }}</span></div><small class="text-secondary">{{ dataset.dataset_type }} · {{ dataset.versions[0].record_count }} stored file(s)</small></a>{% else %}<div class="list-group-item text-center py-5 text-secondary">No datasets uploaded.</div>{% endfor %}</div>
+{% endblock %}

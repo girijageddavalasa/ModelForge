@@ -24,6 +24,9 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     STORAGE_PATH = Path(os.getenv("STORAGE_PATH", PROJECT_ROOT / "storage")).resolve()
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+    MAX_CONTENT_LENGTH = int(os.getenv("MAX_CONTENT_LENGTH", 500 * 1024 * 1024))
+    MAX_UPLOAD_FILES = int(os.getenv("MAX_UPLOAD_FILES", 5000))
+    MAX_EXTRACTED_SIZE = int(os.getenv("MAX_EXTRACTED_SIZE", 500 * 1024 * 1024))
 
     @staticmethod
     def environment_name() -> str:

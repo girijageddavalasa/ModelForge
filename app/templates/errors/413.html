@@ -1,0 +1,5 @@
+﻿{% extends "base.html" %}
+{% block title %}Upload too large · ModelForge Local{% endblock %}
+{% block content %}
+<section class="text-center py-5"><h1 class="display-1 fw-bold">413</h1><p class="lead">The upload exceeds the configured size limit.</p><a class="btn btn-primary" href="{{ url_for('main.home') }}">Return to dashboard</a></section>
+{% endblock %}

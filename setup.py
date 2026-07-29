@@ -15,5 +15,6 @@ setup(
         "Flask-Migrate==4.1.0",
         "Flask-SQLAlchemy==3.1.1",
         "python-dotenv==1.1.1",
+        "Pillow==11.3.0",
     ],
 )

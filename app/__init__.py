@@ -9,6 +9,7 @@ from flask import Flask
 
 from app.config import CONFIGURATIONS, Config, ProductionConfig
 from app.extensions import bootstrap, db, migrate
+from app.routes.datasets import datasets
 from app.routes.errors import errors
 from app.routes.main import main
 from app.routes.projects import projects
@@ -88,6 +89,7 @@ def import_models() -> None:
 def register_routes(app: Flask) -> None:
     """Register application route blueprints."""
     app.register_blueprint(main)
+    app.register_blueprint(datasets)
     app.register_blueprint(projects)
 
 
