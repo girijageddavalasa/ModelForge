@@ -1,4 +1,4 @@
-﻿"""Model registry pages, downloads, activation, and prediction API."""
+"""Model registry pages, downloads, activation, and prediction API."""
 
 from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, send_file, url_for
 
@@ -51,7 +51,7 @@ def download(model_id: int):
     except (ValueError, FileNotFoundError) as error:
         flash(str(error), "danger")
         return redirect(url_for("models.detail", model_id=model_id))
-    return send_file(path, as_attachment=True, download_name=f"model-v{model.version_number}-{model.model_name}.joblib")
+    return send_file(path, as_attachment=True, download_name=f"model-v{model.version_number}-{model.model_name}{path.suffix}")
 
 
 @models.get("/projects/<int:project_id>/models/compare")
@@ -82,3 +82,16 @@ def predict_tabular(model_id: int):
     except FileNotFoundError:
         return jsonify({"error": "Model artifact is unavailable."}), 410
     return jsonify(result)
+
+@models.get("/models/<int:model_id>/export/download")
+def download_export(model_id: int):
+    """Download a registered ONNX or other export artifact."""
+    try:
+        model = model_registry_service.get_model_version(model_id)
+        path = model_registry_service.export_artifact_path(model)
+    except ModelVersionNotFoundError:
+        abort(404)
+    except (ValueError, FileNotFoundError) as error:
+        flash(str(error), "danger")
+        return redirect(url_for("models.detail", model_id=model_id))
+    return send_file(path, as_attachment=True, download_name=f"model-v{model.version_number}-{model.model_name}{path.suffix}")

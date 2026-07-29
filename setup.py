@@ -20,5 +20,9 @@ setup(
         "pandas==2.3.1",
         "scikit-learn==1.7.1",
         "joblib==1.5.1",
+        "PyYAML==6.0.2",
+        "ultralytics==8.4.102",
+        "onnx==1.22.0",
+        "onnxruntime==1.27.0",
     ],
 )

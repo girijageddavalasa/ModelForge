@@ -1,4 +1,4 @@
-﻿"""Spawn-safe local process worker for training jobs."""
+"""Spawn-safe local process worker for training jobs."""
 
 from __future__ import annotations
 
@@ -31,7 +31,7 @@ def start_training_job(job_id: int) -> int | None:
 def run_training_job_process(job_id: int, database_uri: str, storage_path: str, log_level: str) -> None:
     """Create an isolated Flask context and execute one queued job."""
     from app import create_app
-    from app.services.training_service import execute_training_job
+    from app.workers.job_runner import execute_job
 
     application = create_app(
         "development",
@@ -44,6 +44,6 @@ def run_training_job_process(job_id: int, database_uri: str, storage_path: str, 
     )
     with application.app_context():
         try:
-            execute_training_job(job_id)
+            execute_job(job_id)
         except Exception:
             application.logger.exception("Worker failed while executing training job %s", job_id)

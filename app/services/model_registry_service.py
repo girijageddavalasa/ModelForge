@@ -1,4 +1,4 @@
-﻿"""Immutable model-version registry services."""
+"""Immutable model-version registry services."""
 
 from __future__ import annotations
 
@@ -39,12 +39,15 @@ def register_job_models(job: TrainingJob) -> list[ModelVersion]:
             version_number=current_max + offset,
             model_name=result["plugin"],
             model_path=result["artifact_path"],
-            export_path=result["artifact_path"],
+            export_path=result.get("export_path", result["artifact_path"]),
             metrics_json=result["metrics"],
             configuration_json={
                 "display_name": result["display_name"],
-                "random_seed": job.configuration_json["random_seed"],
-                "test_size": job.configuration_json["test_size"],
+                **{
+                    key: value
+                    for key, value in job.configuration_json.items()
+                    if key not in {"results", "worker_pid"}
+                },
             },
             is_active=not has_active and offset == 1,
         )
@@ -98,3 +101,17 @@ def project_for_models(project_id: int) -> Project:
     if project is None:
         raise LookupError(f"Project {project_id} was not found.")
     return project
+
+def export_artifact_path(model: ModelVersion) -> Path:
+    """Resolve and validate a registered export artifact."""
+    if not model.export_path:
+        raise FileNotFoundError("This model has no export artifact.")
+    root = Path(current_app.config["STORAGE_PATH"]).resolve()
+    path = (root / model.export_path).resolve()
+    try:
+        path.relative_to(root)
+    except ValueError as error:
+        raise ValueError("Unsafe export artifact path.") from error
+    if not path.is_file():
+        raise FileNotFoundError("The export artifact is missing.")
+    return path

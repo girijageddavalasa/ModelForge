@@ -50,6 +50,7 @@ def create_training_job(
         status="queued",
         progress=0,
         configuration_json={
+            "workflow": "tabular",
             "plugins": selected,
             "random_seed": random_seed,
             "test_size": test_size,
