@@ -1,8 +1,8 @@
-﻿"""Dataset upload and browsing routes."""
+﻿"""Dataset upload, browsing, and analysis routes."""
 
 from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
 
-from app.services import dataset_service, project_service
+from app.services import csv_analysis_service, dataset_service, project_service
 from app.services.dataset_service import DatasetNotFoundError, DatasetValidationError
 from app.services.project_service import ProjectNotFoundError
 
@@ -16,11 +16,7 @@ def index(project_id: int) -> str:
         project = project_service.get_project(project_id)
     except ProjectNotFoundError:
         abort(404)
-    return render_template(
-        "datasets/index.html",
-        project=project,
-        datasets=dataset_service.list_project_datasets(project_id),
-    )
+    return render_template("datasets/index.html", project=project, datasets=dataset_service.list_project_datasets(project_id))
 
 
 @datasets.route("/projects/<int:project_id>/datasets/upload", methods=["GET", "POST"])
@@ -32,11 +28,7 @@ def upload(project_id: int) -> str:
         abort(404)
     if request.method == "POST":
         try:
-            dataset = dataset_service.upload_dataset(
-                project,
-                request.form.get("name", ""),
-                request.files.getlist("files"),
-            )
+            dataset = dataset_service.upload_dataset(project, request.form.get("name", ""), request.files.getlist("files"))
         except DatasetValidationError as error:
             flash(str(error), "danger")
         else:
@@ -53,3 +45,27 @@ def detail(dataset_id: int) -> str:
     except DatasetNotFoundError:
         abort(404)
     return render_template("datasets/detail.html", dataset=dataset)
+
+
+@datasets.route("/datasets/<int:dataset_id>/analysis", methods=["GET", "POST"])
+def analysis(dataset_id: int) -> str:
+    """Run or display persisted CSV quality analysis."""
+    try:
+        dataset = dataset_service.get_dataset(dataset_id)
+        if dataset.dataset_type != "tabular":
+            raise DatasetValidationError("CSV analysis is available only for tabular datasets.")
+        result = csv_analysis_service.get_analysis(dataset)
+        if request.method == "POST":
+            target = request.form.get("target_column", "").strip() or None
+            result = csv_analysis_service.analyze_dataset(dataset, target)
+            flash("CSV analysis completed.", "success")
+    except DatasetNotFoundError:
+        abort(404)
+    except DatasetValidationError as error:
+        flash(str(error), "danger")
+        return redirect(url_for("datasets.detail", dataset_id=dataset_id))
+    columns = list(result["data_types"]) if result else []
+    if not columns:
+        version = max(dataset.versions, key=lambda item: item.version_number)
+        columns = version.metadata_json.get("analysis", {}).get("data_types", {}).keys()
+    return render_template("datasets/analysis.html", dataset=dataset, analysis=result, columns=columns)

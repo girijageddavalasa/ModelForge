@@ -6,7 +6,7 @@ be tested before the next one begins.
 
 ## Current implementation status
 
-**Completed: Stage 2 â€” Database & Project Management.**
+**Completed: Stage 2 Ã¢â‚¬â€ Database & Project Management.**
 
 The repository currently includes:
 
@@ -26,9 +26,9 @@ The repository currently includes:
 The following features from the overall architecture are **not implemented
 yet** because they belong to later stages:
 
-- CSV analysis and preprocessing (Stages 4â€“5)
-- AutoML, workers, predictions, and model versioning (Stages 6â€“8)
-- Image annotation and YOLO (Stages 9â€“10)
+- CSV analysis and preprocessing (Stages 4Ã¢â‚¬â€œ5)
+- AutoML, workers, predictions, and model versioning (Stages 6Ã¢â‚¬â€œ8)
+- Image annotation and YOLO (Stages 9Ã¢â‚¬â€œ10)
 - Active learning (Stage 11)
 - Final production hardening (Stage 12)
 
@@ -73,6 +73,23 @@ To test manually, create a project, open its **Datasets** page, select **Upload
 dataset**, and choose files appropriate to the project's task type. Successful
 uploads show an inventory and relative storage path. Stage 3 validates only
 safe ingestion; statistical CSV analysis begins in Stage 4.
+## Stage 4 features
+
+Stage 4 adds on-demand CSV quality analysis for tabular datasets:
+
+- Row and column counts, inferred data types, and column roles
+- Missing-value and duplicate-row counts
+- Numeric, categorical, constant, identifier-like, and high-cardinality columns
+- IQR-based basic outlier statistics
+- Highly correlated numeric pairs (absolute correlation of at least 0.85)
+- Optional target selection and classification-style balance summary
+- Structured findings persisted in DatasetVersion metadata
+- Human-readable recommendations with measured values and explanations
+- A Bootstrap analysis report linked from each tabular dataset
+
+Open a tabular dataset and select **Analyze CSV**. Optionally enter a target
+column, then run the analysis. Recommendations are advisory: Stage 4 never
+removes columns or changes data. Approval and preprocessing begin in Stage 5.
 ## Architecture
 
 ModelForge Local uses a layered Flask architecture:
@@ -177,9 +194,9 @@ Activate the virtual environment and run:
 python -m pytest -v
 ```
 
-Expected result: all tests pass. The current Stage 3 suite contains 17 tests.
+Expected result: all tests pass. The current Stage 4 suite contains 21 tests.
 
-The tests verify the application foundation, Project CRUD, CSV and image uploads, ZIP ingestion, corrupted-file rejection, duplicate-name rejection, upload limits, and path-traversal protection.
+The tests verify the application foundation, Project CRUD, secure dataset ingestion, and CSV findings including missing values, duplicates, correlations, class imbalance, constant columns, outliers, and invalid targets.
 
 You can also verify imports directly:
 

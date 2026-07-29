@@ -16,5 +16,7 @@ setup(
         "Flask-SQLAlchemy==3.1.1",
         "python-dotenv==1.1.1",
         "Pillow==11.3.0",
+        "numpy==2.3.2",
+        "pandas==2.3.1",
     ],
 )
