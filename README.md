@@ -1,4 +1,4 @@
-﻿# ModelForge Local
+# ModelForge Local
 
 ModelForge Local is planned as a local-first AutoML and active-learning
 platform. Development is deliberately divided into stages so every stage can
@@ -6,7 +6,7 @@ be tested before the next one begins.
 
 ## Current implementation status
 
-**Completed: Stage 1 — Project Foundation.**
+**Completed: Stage 2 — Database & Project Management.**
 
 The repository currently includes:
 
@@ -26,7 +26,6 @@ The repository currently includes:
 The following features from the overall architecture are **not implemented
 yet** because they belong to later stages:
 
-- SQLAlchemy models, schema migrations, and Project CRUD (Stage 2)
 - CSV, image, and ZIP uploads (Stage 3)
 - CSV analysis and preprocessing (Stages 4–5)
 - AutoML, workers, predictions, and model versioning (Stages 6–8)
@@ -37,6 +36,26 @@ yet** because they belong to later stages:
 Do not expect project creation, dataset upload, model training, annotations, or
 prediction APIs in the Stage 1 application.
 
+## Stage 2 features
+
+Stage 2 adds:
+
+- Core SQLAlchemy entities: `Project`, `Dataset`, `DatasetVersion`,
+  `Annotation`, `TrainingJob`, and `ModelVersion`
+- Foreign keys, relationships, uniqueness rules, checks, and indexes
+- A generated Flask-Migrate revision for the complete metadata schema
+- Dashboard and Project list, create, detail, edit, and delete pages
+- A typed `project_service` containing validation and database writes
+- Bootstrap navigation, flash messages, empty states, and project summaries
+
+Initialize or upgrade a local database after installing dependencies:
+
+```text
+python -m flask --app run.py db upgrade
+```
+
+Then start the server with `python run.py`. From the dashboard, select **New
+project**, enter a name, select one of the three supported task types, and save.
 ## Architecture
 
 ModelForge Local uses a layered Flask architecture:
@@ -77,9 +96,7 @@ SQLite is a good default for this project because:
 - It suits a local, single-user application.
 - SQLAlchemy provides an abstraction that can support PostgreSQL later.
 
-Stage 1 configures SQLite, but it does not create application tables because
-database models and the first migration belong to Stage 2. The database file
-may therefore not exist until migrations are created and applied in Stage 2.
+Stage 2 creates the core application tables through Flask-Migrate. Apply the latest migration with `python -m flask --app run.py db upgrade`. The database is stored at `instance/modelforge.db`.
 
 ## Prerequisites
 
@@ -135,7 +152,7 @@ python run.py
 
 Open <http://127.0.0.1:5000> and stop the server with `Ctrl+C`.
 
-## How to test Stage 1 yourself
+## How to test the application yourself
 
 Activate the virtual environment and run:
 
@@ -143,17 +160,9 @@ Activate the virtual environment and run:
 python -m pytest -v
 ```
 
-Expected result:
+Expected result: all tests pass. The current Stage 2 suite contains 9 tests.
 
-```text
-3 passed
-```
-
-The tests verify that:
-
-1. The application factory creates a testing application.
-2. The homepage responds successfully and contains the project title.
-3. An unknown URL returns the custom 404 page.
+The tests verify application creation, the dashboard, custom errors, project creation, input validation, project editing, deletion, and missing-project handling.
 
 You can also verify imports directly:
 
@@ -195,7 +204,7 @@ modelforge-local/
 |   |-- __init__.py       Application factory and initialization
 |   |-- config.py         Environment-specific configuration
 |   |-- extensions.py     Unbound Flask extensions
-|   |-- models/           Models begin in Stage 2
+|   |-- models/           SQLAlchemy metadata entities
 |   |-- routes/           Thin HTTP blueprints
 |   |-- services/         Future business logic
 |   |-- workers/          Future background jobs

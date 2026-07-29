@@ -1,0 +1,12 @@
+﻿{% extends "base.html" %}
+{% block title %}{{ 'Edit' if project else 'New' }} project · ModelForge Local{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7"><div class="card shadow-sm"><div class="card-body p-4">
+<h1 class="h3 mb-4">{{ 'Edit project' if project else 'Create project' }}</h1>
+<form method="post" novalidate>
+<div class="mb-3"><label class="form-label" for="name">Project name</label><input class="form-control" id="name" name="name" maxlength="120" required value="{{ request.form.get('name', project.name if project else '') }}"></div>
+<div class="mb-3"><label class="form-label" for="task_type">Task type</label><select class="form-select" id="task_type" name="task_type" required><option value="">Select a task type</option>{% set selected = request.form.get('task_type', project.task_type if project else '') %}{% for value, label in task_types.items() %}<option value="{{ value }}" {% if selected == value %}selected{% endif %}>{{ label }}</option>{% endfor %}</select></div>
+<div class="mb-4"><label class="form-label" for="description">Description</label><textarea class="form-control" id="description" name="description" rows="5" maxlength="5000">{{ request.form.get('description', project.description if project else '') }}</textarea></div>
+<button class="btn btn-primary" type="submit">{{ 'Save changes' if project else 'Create project' }}</button> <a class="btn btn-outline-secondary" href="{{ url_for('projects.detail', project_id=project.id) if project else url_for('projects.index') }}">Cancel</a>
+</form></div></div></div></div>
+{% endblock %}

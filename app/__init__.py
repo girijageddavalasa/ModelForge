@@ -1,4 +1,4 @@
-﻿"""Application factory for ModelForge Local."""
+"""Application factory for ModelForge Local."""
 
 from __future__ import annotations
 
@@ -11,6 +11,7 @@ from app.config import CONFIGURATIONS, Config, ProductionConfig
 from app.extensions import bootstrap, db, migrate
 from app.routes.errors import errors
 from app.routes.main import main
+from app.routes.projects import projects
 
 
 def create_app(config_name: str | None = None) -> Flask:
@@ -31,6 +32,7 @@ def create_app(config_name: str | None = None) -> Flask:
     configure_logging(app)
     create_runtime_directories(app)
     initialize_extensions(app)
+    import_models()
     register_routes(app)
     register_error_handlers(app)
 
@@ -78,9 +80,15 @@ def initialize_extensions(app: Flask) -> None:
     bootstrap.init_app(app)
 
 
+def import_models() -> None:
+    """Import models so Flask-Migrate can discover their metadata."""
+    from app import models  # noqa: F401
+
+
 def register_routes(app: Flask) -> None:
     """Register application route blueprints."""
     app.register_blueprint(main)
+    app.register_blueprint(projects)
 
 
 def register_error_handlers(app: Flask) -> None:
