@@ -1,0 +1,24 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}ModelForge Local{% endblock %}</title>
+    {{ bootstrap.load_css() }}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand fw-semibold" href="{{ url_for('main.home') }}">
+                ModelForge Local
+            </a>
+        </div>
+    </nav>
+    <main class="container py-5">
+        {% block content %}{% endblock %}
+    </main>
+    {{ bootstrap.load_js() }}
+</body>
+</html>
+

@@ -1,0 +1,12 @@
+﻿{% extends "base.html" %}
+
+{% block title %}Page not found Â· ModelForge Local{% endblock %}
+
+{% block content %}
+<section class="text-center py-5">
+    <h1 class="display-1 fw-bold">404</h1>
+    <p class="lead">The page you requested could not be found.</p>
+    <a class="btn btn-primary" href="{{ url_for('main.home') }}">Return home</a>
+</section>
+{% endblock %}
+

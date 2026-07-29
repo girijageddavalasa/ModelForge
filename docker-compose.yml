@@ -1,0 +1,17 @@
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      FLASK_ENV: production
+      SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY before starting the service}
+      DATABASE_URL: sqlite:////app/instance/modelforge.db
+      STORAGE_PATH: /app/storage
+    volumes:
+      - modelforge-instance:/app/instance
+      - modelforge-storage:/app/storage
+
+volumes:
+  modelforge-instance:
+  modelforge-storage:
