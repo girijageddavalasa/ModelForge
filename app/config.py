@@ -27,6 +27,7 @@ class Config:
     MAX_CONTENT_LENGTH = int(os.getenv("MAX_CONTENT_LENGTH", 500 * 1024 * 1024))
     MAX_UPLOAD_FILES = int(os.getenv("MAX_UPLOAD_FILES", 5000))
     MAX_EXTRACTED_SIZE = int(os.getenv("MAX_EXTRACTED_SIZE", 500 * 1024 * 1024))
+    PREDICTION_MAX_BATCH = int(os.getenv("PREDICTION_MAX_BATCH", 1000))
 
     @staticmethod
     def environment_name() -> str:

@@ -1,11 +1,11 @@
-﻿"""Core relational entities for ModelForge Local."""
+"""Core relational entities for ModelForge Local."""
 
 from __future__ import annotations
 
 from datetime import datetime, timezone
 from typing import Any
 
-from sqlalchemy import CheckConstraint, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint
+from sqlalchemy import Boolean, CheckConstraint, Float, ForeignKey, Index, Integer, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.extensions import db
@@ -155,6 +155,7 @@ class ModelVersion(db.Model):
     model_name: Mapped[str] = mapped_column(String(120), nullable=False)
     model_path: Mapped[str] = mapped_column(String(1024), nullable=False)
     export_path: Mapped[str | None] = mapped_column(String(1024))
+    is_active: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     metrics_json: Mapped[dict[str, Any]] = mapped_column(db.JSON, default=dict, nullable=False)
     configuration_json: Mapped[dict[str, Any]] = mapped_column(db.JSON, default=dict, nullable=False)
     created_at: Mapped[datetime] = mapped_column(default=utc_now, nullable=False)

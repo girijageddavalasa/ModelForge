@@ -114,6 +114,8 @@ def execute_training_job(job_id: int) -> TrainingJob:
         job.progress = 100
         job.completed_at = utc_now()
         db.session.commit()
+        from app.services.model_registry_service import register_job_models
+        register_job_models(job)
         LOGGER.info("Completed training job %s", job.id)
         return job
     except Exception as error:

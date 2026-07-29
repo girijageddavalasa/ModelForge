@@ -6,7 +6,7 @@ be tested before the next one begins.
 
 ## Current implementation status
 
-**Completed: Stage 2 ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â Database & Project Management.**
+**Completed: Stage 2 ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â Database & Project Management.**
 
 The repository currently includes:
 
@@ -26,9 +26,9 @@ The repository currently includes:
 The following features from the overall architecture are **not implemented
 yet** because they belong to later stages:
 
-- CSV analysis and preprocessing (Stages 4ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“5)
-- AutoML, workers, predictions, and model versioning (Stages 6ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“8)
-- Image annotation and YOLO (Stages 9ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“10)
+- CSV analysis and preprocessing (Stages 4ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ5)
+- AutoML, workers, predictions, and model versioning (Stages 6ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ8)
+- Image annotation and YOLO (Stages 9ÃƒÆ’Ã†â€™Ãƒâ€ Ã¢â‚¬â„¢ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã‚Â¡ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã¢â‚¬Â¦ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ10)
 - Active learning (Stage 11)
 - Final production hardening (Stage 12)
 
@@ -146,6 +146,33 @@ polls once per second while the local worker fits candidates. The API returns
 `id`, `status`, `progress`, `error_message`, and `result_url`. This local process
 boundary can later be replaced by a distributed queue without changing model
 plugins.
+## Stage 8 features
+
+Stage 8 adds an immutable tabular model registry and prediction workflow:
+
+- One ModelVersion per successfully trained candidate
+- Monotonic project-level version numbers and idempotent registration
+- Exactly one user-selected active version per project through service logic
+- Metrics/configuration detail and side-by-side comparison pages
+- Safe `.joblib` artifact downloads constrained to local storage
+- Browser JSON prediction tester implemented with Vanilla JavaScript
+- Single-record and batch tabular prediction
+- Class probabilities when the estimator supports them
+- Configurable maximum prediction batch size
+- Structured validation errors and processing time
+
+Prediction endpoint:
+
+```text
+POST /api/models/<model_id>/predict/tabular
+Content-Type: application/json
+
+{"age": 35, "city": "A"}
+```
+
+A non-empty array of objects is also accepted. Responses include the model ID,
+version, model name, processing time, predictions, and probabilities when
+available. Image prediction remains deferred until a YOLO model exists.
 ## Architecture
 
 ModelForge Local uses a layered Flask architecture:
@@ -250,9 +277,9 @@ Activate the virtual environment and run:
 python -m pytest -v
 ```
 
-Expected result: all tests pass. The current Stage 7 suite contains 32 tests.
+Expected result: all tests pass. The current Stage 8 suite contains 38 tests.
 
-The tests verify the full foundation through AutoML plus queued jobs, worker execution, progress serialization, process-launch failures, polling APIs, and loadable artifacts.
+The tests verify the full foundation through worker execution plus immutable model registration, exclusive activation, comparison, downloads, input validation, and real single/batch predictions.
 
 You can also verify imports directly:
 
