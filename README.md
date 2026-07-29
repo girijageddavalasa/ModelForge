@@ -6,7 +6,7 @@ be tested before the next one begins.
 
 ## Current implementation status
 
-**Completed: Stage 2 ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã‚Â Database & Project Management.**
+**Completed: Stage 2 ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€šÃ‚Â Database & Project Management.**
 
 The repository currently includes:
 
@@ -26,9 +26,9 @@ The repository currently includes:
 The following features from the overall architecture are **not implemented
 yet** because they belong to later stages:
 
-- CSV analysis and preprocessing (Stages 4ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ5)
-- AutoML, workers, predictions, and model versioning (Stages 6ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ8)
-- Image annotation and YOLO (Stages 9ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬ÃƒÂ¢Ã¢â€šÂ¬Ã…â€œ10)
+- CSV analysis and preprocessing (Stages 4ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“5)
+- AutoML, workers, predictions, and model versioning (Stages 6ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“8)
+- Image annotation and YOLO (Stages 9ÃƒÆ’Ã†â€™Ãƒâ€šÃ‚Â¢ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â€šÂ¬Ã…Â¡Ãƒâ€šÃ‚Â¬ÃƒÆ’Ã‚Â¢ÃƒÂ¢Ã¢â‚¬Å¡Ã‚Â¬Ãƒâ€¦Ã¢â‚¬Å“10)
 - Active learning (Stage 11)
 - Final production hardening (Stage 12)
 
@@ -127,6 +127,25 @@ Open an approved preprocessing configuration and select **Train models**.
 Stage 6 executes training synchronously for a simple verified baseline. Stage 7
 will move this same service boundary into a local background process and expose
 progress polling.
+## Stage 7 features
+
+Stage 7 moves model fitting out of the Flask request lifecycle:
+
+- Queued TrainingJob creation before process startup
+- Windows-safe `multiprocessing` spawn context and top-level worker target
+- A fresh Flask application and SQLAlchemy session inside each worker process
+- Persisted queued, running, completed, and failed states
+- Candidate-level progress updates and stored worker PID
+- Launch-failure and execution-failure persistence
+- SQLite WAL mode, foreign-key enforcement, 30-second busy timeout
+- `GET /api/training-jobs/<job_id>/status` polling endpoint
+- Vanilla JavaScript progress polling and terminal-state page refresh
+
+Starting training now redirects immediately to its progress page. The browser
+polls once per second while the local worker fits candidates. The API returns
+`id`, `status`, `progress`, `error_message`, and `result_url`. This local process
+boundary can later be replaced by a distributed queue without changing model
+plugins.
 ## Architecture
 
 ModelForge Local uses a layered Flask architecture:
@@ -231,9 +250,9 @@ Activate the virtual environment and run:
 python -m pytest -v
 ```
 
-Expected result: all tests pass. The current Stage 6 suite contains 29 tests.
+Expected result: all tests pass. The current Stage 7 suite contains 32 tests.
 
-The tests verify the foundation, project and dataset workflows, CSV analysis, preprocessing, plugin registration, classification and regression training, metrics, and loadable joblib artifacts.
+The tests verify the full foundation through AutoML plus queued jobs, worker execution, progress serialization, process-launch failures, polling APIs, and loadable artifacts.
 
 You can also verify imports directly:
 

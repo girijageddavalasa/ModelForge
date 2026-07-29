@@ -1,17 +1,18 @@
-﻿"""Tabular training configuration and result routes."""
+"""Tabular training configuration, status, and result routes."""
 
-from flask import Blueprint, abort, flash, redirect, render_template, request, url_for
+from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, url_for
 
 from app.services import dataset_service, training_service
 from app.services.dataset_service import DatasetNotFoundError
 from app.services.training_service import TrainingError
+from app.workers import training_worker
 
 training = Blueprint("training", __name__)
 
 
 @training.route("/datasets/<int:dataset_id>/train", methods=["GET", "POST"])
 def configure(dataset_id: int) -> str:
-    """Configure and synchronously run Stage 6 candidate training."""
+    """Validate a training request, queue it, and launch a local worker."""
     try:
         dataset = dataset_service.get_dataset(dataset_id)
     except DatasetNotFoundError:
@@ -21,20 +22,40 @@ def configure(dataset_id: int) -> str:
         try:
             seed = int(request.form.get("random_seed", "42"))
             test_size = float(request.form.get("test_size", "0.2"))
-            job = training_service.train_candidates(dataset, request.form.getlist("plugins"), seed, test_size)
+            job = training_service.create_training_job(
+                dataset, request.form.getlist("plugins"), seed, test_size,
+            )
+            try:
+                pid = training_worker.start_training_job(job.id)
+            except Exception as error:
+                training_service.mark_launch_failed(job.id, "The local training worker could not start.")
+                raise TrainingError("The local training worker could not start.") from error
+            job.configuration_json = {**job.configuration_json, "worker_pid": pid}
+            from app.extensions import db
+            db.session.commit()
         except (ValueError, TrainingError) as error:
             flash(str(error), "danger")
         else:
-            flash("Candidate training completed.", "success")
+            flash("Training job queued.", "success")
             return redirect(url_for("training.result", job_id=job.id))
     return render_template("training/configure.html", dataset=dataset, plugins=plugins)
 
 
 @training.get("/training-jobs/<int:job_id>")
 def result(job_id: int) -> str:
-    """Display candidate metrics and artifact paths."""
+    """Display live progress or completed candidate metrics."""
     try:
         job = training_service.get_training_job(job_id)
     except LookupError:
         abort(404)
     return render_template("training/result.html", job=job)
+
+
+@training.get("/api/training-jobs/<int:job_id>/status")
+def status(job_id: int):
+    """Return JSON progress for Vanilla JavaScript polling."""
+    try:
+        job = training_service.get_training_job(job_id)
+    except LookupError:
+        return jsonify({"error": "Training job not found."}), 404
+    return jsonify(training_service.job_status(job))

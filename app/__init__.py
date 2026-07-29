@@ -16,7 +16,10 @@ from app.routes.projects import projects
 from app.routes.training import training
 
 
-def create_app(config_name: str | None = None) -> Flask:
+def create_app(
+    config_name: str | None = None,
+    config_overrides: dict[str, object] | None = None,
+) -> Flask:
     """Create and configure a ModelForge Local Flask application."""
     app = Flask(__name__, instance_relative_config=True)
     selected_config = config_name or Config.environment_name()
