@@ -115,3 +115,13 @@ def export_artifact_path(model: ModelVersion) -> Path:
     if not path.is_file():
         raise FileNotFoundError("The export artifact is missing.")
     return path
+
+def active_project_model(project_id: int) -> ModelVersion:
+    """Return the active model for a project."""
+    model = db.session.scalar(select(ModelVersion).where(
+        ModelVersion.project_id == project_id,
+        ModelVersion.is_active.is_(True),
+    ))
+    if model is None:
+        raise ModelVersionNotFoundError("The project has no active model version.")
+    return model

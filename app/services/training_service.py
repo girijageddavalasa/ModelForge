@@ -164,7 +164,7 @@ def job_status(job: TrainingJob) -> dict[str, Any]:
         "status": job.status,
         "progress": job.progress,
         "error_message": job.error_message,
-        "result_url": f"/training-jobs/{job.id}",
+        "result_url": job.configuration_json.get("return_url", f"/training-jobs/{job.id}"),
     }
 
 

@@ -1,4 +1,4 @@
-﻿(() => {
+(() => {
     "use strict";
     const root = document.getElementById("annotation-app");
     if (!root || typeof Konva === "undefined") return;
@@ -21,6 +21,9 @@
         return `hsl(${Math.abs(hash) % 360}, 80%, 50%)`;
     };
     const syncLabel = (entry) => entry.label.position({x: entry.rect.x(), y: Math.max(0, entry.rect.y() - 20)});
+    const markCorrected = (rect) => {
+        if (rect.getAttr("source") === "model") rect.setAttr("source", "human_corrected");
+    };
     const select = (rect) => {
         transformer.nodes(rect ? [rect] : []);
         layer.draw();
@@ -42,8 +45,12 @@
         boxes.push(entry);
         layer.add(rect, label);
         rect.on("click tap", (event) => { event.cancelBubble = true; select(rect); });
-        rect.on("dragmove", () => syncLabel(entry));
+        rect.on("dragmove", () => {
+            markCorrected(rect);
+            syncLabel(entry);
+        });
         rect.on("transformend", () => {
+            markCorrected(rect);
             rect.width(Math.max(2, rect.width() * rect.scaleX()));
             rect.height(Math.max(2, rect.height() * rect.scaleY()));
             rect.scale({x: 1, y: 1});
@@ -122,6 +129,20 @@
     document.getElementById("draw-tool").addEventListener("click", () => { drawing = true; status.textContent = "Draw mode active"; });
     document.getElementById("delete-box").addEventListener("click", deleteSelected);
     document.getElementById("save-annotations").addEventListener("click", () => save().catch((error) => { status.textContent = error.message; }));
+    classSelector.addEventListener("change", () => {
+        const selected = transformer && transformer.nodes()[0];
+        if (!selected) return;
+        const entry = boxes.find((item) => item.rect === selected);
+        if (!entry) return;
+        selected.setAttr("className", classSelector.value);
+        selected.setAttr("confidence", null);
+        markCorrected(selected);
+        const color = colorFor(classSelector.value);
+        selected.stroke(color);
+        entry.label.text(classSelector.value);
+        entry.label.fill(color);
+        layer.draw();
+    });
     document.addEventListener("keydown", (event) => {
         if (["INPUT", "TEXTAREA", "SELECT"].includes(event.target.tagName)) return;
         if (event.key.toLowerCase() === "b") drawing = true;

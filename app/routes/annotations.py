@@ -1,10 +1,10 @@
-﻿"""Image gallery and annotation HTTP routes."""
+"""Image gallery and annotation HTTP routes."""
 
 from __future__ import annotations
 
 from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, send_file, url_for
 
-from app.services import annotation_service, dataset_service
+from app.services import active_learning_service, annotation_service, dataset_service
 from app.services.annotation_service import AnnotationValidationError
 from app.services.dataset_service import DatasetNotFoundError, DatasetValidationError
 
@@ -110,6 +110,7 @@ def annotation_save(dataset_id: int):
             int(payload.get("image_height", 0)),
             boxes,
         )
+        active_learning_service.mark_reviewed(dataset, str(payload.get("image", "")))
     except DatasetNotFoundError:
         return jsonify({"error": "Dataset not found."}), 404
     except FileNotFoundError:
