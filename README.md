@@ -2,7 +2,7 @@
 
 ModelForge Local is a local-first AutoML and active-learning platform for tabular classification, tabular regression, and YOLO object detection. Data, SQLite metadata, model artifacts, and generated datasets remain on the local machine.
 
-**Current status: Stage 11 - Active Learning is complete.** Stage 12 production hardening is not implemented yet.
+**Current status: Stages 1-12 are complete.** The planned production-quality platform scope is implemented.
 
 ## Features implemented
 
@@ -18,6 +18,7 @@ ModelForge Local is a local-first AutoML and active-learning platform for tabula
 - Browser-based bounding-box annotation with Konva.js and keyboard shortcuts
 - YOLO dataset generation, training, PT artifacts, ONNX export, and ONNX Runtime validation
 - Active-model pre-annotation, confidence thresholding, uncertainty-ranked review, correction provenance, reviewed dataset versions, and retraining handoff
+- CSRF-protected browser forms, security headers, request IDs, access timing logs, health checks, and production container hardening
 
 ## Requirements
 
@@ -75,7 +76,7 @@ node --check app/static/js/annotation_canvas.js
 python -m flask --app run.py db check
 ```
 
-The current automated suite contains 54 passing tests. YOLO training may download the selected base weights on first use.
+The current automated suite contains 57 passing tests. YOLO training may download the selected base weights on first use.
 
 ## Active-learning workflow
 
@@ -109,13 +110,27 @@ run.py              Local application entry point
 
 Routes translate HTTP requests and responses; services own business rules and persistence workflows. Model/plugin code remains isolated in `app/ml`, and background execution remains in `app/workers`.
 
-## Docker
+## Production and Docker
+
+Generate a strong secret before the first container start. In PowerShell:
 
 ```text
-docker compose up --build
+$env:SECRET_KEY = python -c "import secrets; print(secrets.token_urlsafe(48))"
+docker compose up --build -d
+docker compose ps
+docker compose logs -f web
 ```
 
-The compose configuration mounts persistent local storage. Review `.env` and production secrets before exposing the service outside localhost.
+The production image runs as an unprivileged user, drops Linux capabilities, prevents privilege escalation, applies database migrations before startup, and serves Flask with Gunicorn. The port binds to `127.0.0.1` by default. Keep that binding for a local-only installation. If a reverse proxy exposes the service, terminate HTTPS there and set `SESSION_COOKIE_SECURE=true`.
+
+Operational endpoints:
+
+- `GET /health/live` confirms that the web process responds.
+- `GET /health/ready` confirms that SQLite accepts queries.
+
+Application logs go to stdout and to the size-rotated file configured by `LOG_PATH`. Every response includes `X-Request-ID`; provide that header when tracing a request across logs. Browser responses include CSP, clickjacking, MIME-sniffing, referrer, and permissions defenses. Browser forms require CSRF tokens; JSON prediction and annotation endpoints enforce JSON payload validation and remain explicitly CSRF-exempt for programmatic local clients.
+
+For backups, stop writes and copy both persistent volumes (or local `instance/` and `storage/` directories). Restore them together because SQLite records refer to artifacts in storage. Test restoration before relying on a backup. SQLite supports a single web worker with multiple threads; keep `WEB_WORKERS=1` unless migrating to a server database in a future architecture change.
 
 ## Push changes to GitHub
 
@@ -129,6 +144,6 @@ git push origin main
 
 Check the result at https://github.com/girijageddavalasa/ModelForge.
 
-## Next stage
+## Completion status
 
-Stage 12 will add production hardening: expanded security and testing, deployment logging, documentation, and performance tuning. It is intentionally outside Stage 11.
+Stages 1-12 are complete. Future changes should be managed as separately scoped enhancements with migrations, tests, and release notes.

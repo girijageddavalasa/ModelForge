@@ -24,11 +24,18 @@ class Config:
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     STORAGE_PATH = Path(os.getenv("STORAGE_PATH", PROJECT_ROOT / "storage")).resolve()
     LOG_LEVEL = os.getenv("LOG_LEVEL", "INFO").upper()
+    LOG_PATH = Path(os.getenv("LOG_PATH", INSTANCE_PATH / "modelforge.log")).resolve()
+    LOG_MAX_BYTES = int(os.getenv("LOG_MAX_BYTES", 10 * 1024 * 1024))
+    LOG_BACKUP_COUNT = int(os.getenv("LOG_BACKUP_COUNT", 5))
     MAX_CONTENT_LENGTH = int(os.getenv("MAX_CONTENT_LENGTH", 500 * 1024 * 1024))
     MAX_UPLOAD_FILES = int(os.getenv("MAX_UPLOAD_FILES", 5000))
     MAX_EXTRACTED_SIZE = int(os.getenv("MAX_EXTRACTED_SIZE", 500 * 1024 * 1024))
     PREDICTION_MAX_BATCH = int(os.getenv("PREDICTION_MAX_BATCH", 1000))
     MAX_ANNOTATIONS_PER_IMAGE = int(os.getenv("MAX_ANNOTATIONS_PER_IMAGE", 1000))
+    SQLALCHEMY_ENGINE_OPTIONS = {"pool_pre_ping": True}
+    SESSION_COOKIE_HTTPONLY = True
+    SESSION_COOKIE_SAMESITE = "Lax"
+    SEND_FILE_MAX_AGE_DEFAULT = 3600
 
     @staticmethod
     def environment_name() -> str:
@@ -47,6 +54,7 @@ class ProductionConfig(Config):
 
     DEBUG = False
     TESTING = False
+    SESSION_COOKIE_SECURE = os.getenv("SESSION_COOKIE_SECURE", "true").lower() in {"1", "true", "yes", "on"}
 
     @classmethod
     def validate(cls) -> None:
@@ -61,6 +69,7 @@ class TestingConfig(Config):
     TESTING = True
     SQLALCHEMY_DATABASE_URI = "sqlite:///:memory:"
     WTF_CSRF_ENABLED = False
+    LOG_PATH = None
 
 
 CONFIGURATIONS: dict[str, type[Config]] = {

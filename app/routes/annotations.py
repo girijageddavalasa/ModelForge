@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, send_file, url_for
 
+from app.extensions import csrf
 from app.services import active_learning_service, annotation_service, dataset_service
 from app.services.annotation_service import AnnotationValidationError
 from app.services.dataset_service import DatasetNotFoundError, DatasetValidationError
@@ -93,6 +94,7 @@ def annotation_list(dataset_id: int):
 
 
 @annotations.put("/api/datasets/<int:dataset_id>/annotations")
+@csrf.exempt
 def annotation_save(dataset_id: int):
     """Validate and replace annotations for one image."""
     payload = request.get_json(silent=True)

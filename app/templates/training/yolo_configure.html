@@ -1,8 +1,8 @@
-﻿{% extends "base.html" %}
+{% extends "base.html" %}
 {% block title %}Train YOLO · {{ dataset.name }}{% endblock %}
 {% block content %}
 <div class="mb-4"><a href="{{ url_for('annotations.gallery', dataset_id=dataset.id) }}" class="text-decoration-none">Image gallery</a><h1 class="h2 mt-2">Train YOLO</h1><p class="text-secondary">Accepted annotations become a deterministic YOLO train/validation dataset. Training runs in a local background process.</p></div>
-<form method="post"><div class="card shadow-sm mb-4"><div class="card-body"><div class="row g-3">
+<form method="post"><input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><div class="card shadow-sm mb-4"><div class="card-body"><div class="row g-3">
 <div class="col-md-6"><label class="form-label" for="base_model">Base model</label><select class="form-select" id="base_model" name="base_model">{% for name in base_models %}<option value="{{ name }}" {% if request.form.get('base_model', 'yolo11n.pt') == name %}selected{% endif %}>{{ name }}</option>{% endfor %}</select></div>
 <div class="col-md-3"><label class="form-label" for="epochs">Epochs</label><input class="form-control" type="number" min="1" max="1000" id="epochs" name="epochs" value="{{ request.form.get('epochs', '20') }}"></div>
 <div class="col-md-3"><label class="form-label" for="image_size">Image size</label><select class="form-select" id="image_size" name="image_size">{% for size in [320,416,512,640,768,1024,1280] %}<option value="{{ size }}" {% if request.form.get('image_size', '640')|int == size %}selected{% endif %}>{{ size }}</option>{% endfor %}</select></div>

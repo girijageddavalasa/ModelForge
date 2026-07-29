@@ -1,4 +1,4 @@
-﻿"""Unbound Flask extension instances and SQLite connection policy."""
+"""Unbound Flask extension instances and SQLite connection policy."""
 
 from __future__ import annotations
 
@@ -7,6 +7,7 @@ import sqlite3
 from flask_bootstrap import Bootstrap5
 from flask_migrate import Migrate
 from flask_sqlalchemy import SQLAlchemy
+from flask_wtf.csrf import CSRFProtect
 from sqlalchemy import event
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import DeclarativeBase
@@ -21,6 +22,7 @@ def configure_sqlite_connection(dbapi_connection: object, _connection_record: ob
     cursor.execute("PRAGMA foreign_keys=ON")
     cursor.execute("PRAGMA busy_timeout=30000")
     cursor.execute("PRAGMA journal_mode=WAL")
+    cursor.execute("PRAGMA synchronous=NORMAL")
     cursor.close()
 
 
@@ -31,3 +33,4 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 migrate = Migrate()
 bootstrap = Bootstrap5()
+csrf = CSRFProtect()

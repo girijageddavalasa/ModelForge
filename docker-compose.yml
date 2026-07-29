@@ -1,16 +1,32 @@
 services:
   web:
     build: .
+    init: true
+    restart: unless-stopped
     ports:
-      - "5000:5000"
+      - "127.0.0.1:5000:5000"
     environment:
       FLASK_ENV: production
       SECRET_KEY: ${SECRET_KEY:?Set SECRET_KEY before starting the service}
       DATABASE_URL: sqlite:////app/instance/modelforge.db
       STORAGE_PATH: /app/storage
+      LOG_PATH: /app/instance/modelforge.log
+      SESSION_COOKIE_SECURE: ${SESSION_COOKIE_SECURE:-false}
+      WEB_WORKERS: ${WEB_WORKERS:-1}
+      WEB_THREADS: ${WEB_THREADS:-4}
     volumes:
       - modelforge-instance:/app/instance
       - modelforge-storage:/app/storage
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:5000/health/ready', timeout=3)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
 
 volumes:
   modelforge-instance:

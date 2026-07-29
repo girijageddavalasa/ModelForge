@@ -2,6 +2,7 @@
 
 from flask import Blueprint, abort, flash, jsonify, redirect, render_template, request, send_file, url_for
 
+from app.extensions import csrf
 from app.services import model_registry_service, prediction_service
 from app.services.model_registry_service import ModelVersionNotFoundError
 from app.services.prediction_service import PredictionValidationError
@@ -68,6 +69,7 @@ def compare(project_id: int) -> str:
 
 
 @models.post("/api/models/<int:model_id>/predict/tabular")
+@csrf.exempt
 def predict_tabular(model_id: int):
     """Run JSON tabular prediction through a registered pipeline."""
     try:
